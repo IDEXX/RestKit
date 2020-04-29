@@ -52,12 +52,31 @@ static BOOL RKIsManagedObjectContextDescendentOfContext(NSManagedObjectContext *
 
 static NSSet *RKSetOfManagedObjectIDsFromManagedObjectContextDidSaveNotification(NSNotification *notification)
 {
-    NSUInteger count = [[[notification.userInfo allValues] valueForKeyPath:@"@sum.@count"] unsignedIntegerValue];
-    NSMutableSet *objectIDs = [NSMutableSet setWithCapacity:count];
-    for (NSSet *objects in [notification.userInfo allValues]) {
-        [objectIDs unionSet:[objects valueForKey:@"objectID"]];
+    // if version < 10.0
+    if ([[[UIDevice currentDevice] systemVersion] compare:@"10.0" options:NSNumericSearch] == NSOrderedAscending)
+    {
+        NSUInteger count = [[[notification.userInfo allValues] valueForKeyPath:@"@sum.@count"] unsignedIntegerValue];
+        NSMutableSet *objectIDs = [NSMutableSet setWithCapacity:count];
+        for (NSSet *objects in [notification.userInfo allValues]) {
+            [objectIDs unionSet:[objects valueForKey:@"objectID"]];
+        }
+        return objectIDs;
     }
-    return objectIDs;
+    else
+    {
+        NSMutableSet *objectIDs = [NSMutableSet set];
+        
+        void (^unionObjectIDs)(NSMutableSet *, NSSet *) = ^(NSMutableSet *objectIDs, NSSet *objects) {
+            if (objects != nil) {
+                [objectIDs unionSet:[objects valueForKey:NSStringFromSelector(@selector(objectID))]];
+            }
+        };
+        
+        unionObjectIDs(objectIDs,notification.userInfo[NSInsertedObjectsKey]);
+        unionObjectIDs(objectIDs,notification.userInfo[NSUpdatedObjectsKey]);
+        unionObjectIDs(objectIDs,notification.userInfo[NSDeletedObjectsKey]);
+        return objectIDs;
+    }
 }
 
 @interface RKManagedObjectContextChangeMergingObserver : NSObject
@@ -225,7 +244,9 @@ static char RKManagedObjectContextChangeMergingObserverAssociationKey;
     if (! persistentStore) return nil;
     if (! [self.persistentStoreCoordinator removePersistentStore:persistentStore error:error]) return nil;
 
-    NSDictionary *seedOptions = @{ RKSQLitePersistentStoreSeedDatabasePathOption: (seedPath ?: [NSNull null]) };
+    // [21.02.2014] Pavel: disabled WAL for sqlite (by default enabled by iOS 7) 
+    //NSDictionary *seedOptions = @{ RKSQLitePersistentStoreSeedDatabasePathOption: (seedPath ?: [NSNull null]) };
+    NSDictionary *seedOptions = @{ RKSQLitePersistentStoreSeedDatabasePathOption: (seedPath ?: [NSNull null]), NSSQLitePragmasOption : @{@"journal_mode" : @"DELETE"} };
     persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nilOrConfigurationName URL:storeURL options:seedOptions error:error];
     if (! persistentStore) return nil;
     

@@ -41,19 +41,6 @@ static char kRKManagedObjectMappingOperationDataSourceAssociatedObjectKey;
 id RKTransformedValueWithClass(id value, Class destinationType, NSValueTransformer *dateToStringValueTransformer);
 NSArray *RKApplyNestingAttributeValueToMappings(NSString *attributeName, id value, NSArray *propertyMappings);
 
-// Return YES if the entity is identified by an attribute that acts as the nesting key in the source representation
-static BOOL RKEntityMappingIsIdentifiedByNestingAttribute(RKEntityMapping *entityMapping)
-{
-    for (NSAttributeDescription *attribute in [entityMapping identificationAttributes]) {
-        RKAttributeMapping *attributeMapping = [[entityMapping propertyMappingsByDestinationKeyPath] objectForKey:[attribute name]];
-        if ([attributeMapping.sourceKeyPath isEqualToString:RKObjectMappingNestingAttributeKeyName]) {
-            return YES;
-        }
-    }
-    
-    return NO;
-}
-
 static id RKValueForAttributeMappingInRepresentation(RKAttributeMapping *attributeMapping, NSDictionary *representation)
 {
     if ([attributeMapping.sourceKeyPath isEqualToString:RKObjectMappingNestingAttributeKeyName]) {
@@ -423,7 +410,7 @@ extern NSString * const RKObjectMappingNestingAttributeKeyName;
 - (BOOL)mappingOperation:(RKMappingOperation *)mappingOperation deleteExistingValueOfRelationshipWithMapping:(RKRelationshipMapping *)relationshipMapping error:(NSError **)error
 {
     // Validate the assignment policy
-    if (! relationshipMapping.assignmentPolicy == RKReplaceAssignmentPolicy) {
+    if (relationshipMapping.assignmentPolicy != RKReplaceAssignmentPolicy) {
         NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: @"Unable to satisfy deletion request: Relationship mapping was expected to have an assignment policy of `RKReplaceAssignmentPolicy`, but did not." };
         NSError *localError = [NSError errorWithDomain:RKErrorDomain code:RKMappingErrorInvalidAssignmentPolicy userInfo:userInfo];
         if (error) *error = localError;

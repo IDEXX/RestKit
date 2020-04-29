@@ -640,7 +640,7 @@ BOOL RKDoesArrayOfResponseDescriptorsContainOnlyEntityMappings(NSArray *response
     [[RKObjectRequestOperation responseMappingQueue] addOperation:self.responseMapperOperation];
 }
 
-- (BOOL)deleteTargetObjectIfAppropriate:(NSError **)error
+- (BOOL)deleteTargetObjectIfAppropriate:(NSError * __autoreleasing *)error
 {
     __block BOOL _blockSuccess = YES;
 

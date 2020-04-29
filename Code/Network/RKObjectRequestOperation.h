@@ -178,6 +178,8 @@ extern NSString * const RKResponseHasBeenMappedCacheUserInfoKey;
  */
 @property (nonatomic, assign) dispatch_queue_t failureCallbackQueue;
 
+@property (nonatomic) BOOL isSynchronizationOff;
+
 /**
  Sets a block to be executed before the object request operation begins mapping the deserialized response body, providing an opportunity to manipulate the mappable representation input that will be passed to the response mapper.
  
