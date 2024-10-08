@@ -1257,6 +1257,9 @@ static NSArray *RKInsertInMetadataList(NSArray *list, id metadata1, id metadata2
     
         // We did some mapping work, if there's no error let's commit our changes to the data source
         if (self.error == nil) {
+            if ([self.delegate respondsToSelector:@selector(mappingOperationDidFinishWithSuccess:)]) {
+                [self.delegate mappingOperationDidFinishWithSuccess:self];
+            }
             if ([dataSource respondsToSelector:@selector(commitChangesForMappingOperation:error:)]) {
                 NSError *error = nil;
                 BOOL success = [dataSource commitChangesForMappingOperation:self error:&error];

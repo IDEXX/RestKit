@@ -97,6 +97,8 @@
  */
 - (void)mappingOperation:(RKMappingOperation *)operation didFailWithError:(NSError *)error;
 
+- (void)mappingOperationDidFinishWithSuccess:(RKMappingOperation *)operation;
+
 ///-----------------------------------------
 /// @name Tracking Dynamic Mapping Selection
 ///-----------------------------------------

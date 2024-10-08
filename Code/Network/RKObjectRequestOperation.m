@@ -472,7 +472,7 @@ static NSString *RKStringDescribingURLResponseWithData(NSURLResponse *response, 
     __weak __typeof(self)weakSelf = self;    
     
     [self.HTTPRequestOperation setCompletionBlockWithSuccess:^(AFRKHTTPRequestOperation *operation, id responseObject) {
-        if (weakSelf.isCancelled) {
+        if (weakSelf.isCancelled || weakSelf.isSynchronizationOff) {
             [weakSelf.stateMachine finish];
             return;
         }
