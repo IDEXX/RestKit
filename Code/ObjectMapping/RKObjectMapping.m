@@ -69,8 +69,8 @@ static RKSourceToDesinationKeyTransformationBlock defaultSourceToDestinationKeyT
     inverseMapping = [RKObjectMapping requestMapping];
     (self.invertedMappings)[dictionaryKey] = inverseMapping;
     [inverseMapping copyPropertiesFromMapping:mapping];
-    // We want to serialize `nil` values
-    inverseMapping.assignsDefaultValueForMissingAttributes = YES;
+    // We don't want to serialize `nil` values
+    inverseMapping.assignsDefaultValueForMissingAttributes = NO;
     
     for (RKAttributeMapping *attributeMapping in mapping.attributeMappings) {
         if (predicate && !predicate(attributeMapping)) continue;
@@ -136,7 +136,7 @@ static RKSourceToDesinationKeyTransformationBlock defaultSourceToDestinationKeyT
 
     // TODO: Hook up value transformers from `RKObjectParameterization`
     RKObjectMapping *objectMapping = [self mappingForClass:[NSMutableDictionary class]];
-    objectMapping.assignsDefaultValueForMissingAttributes = YES;
+    objectMapping.assignsDefaultValueForMissingAttributes = NO;
     return objectMapping;
 }
 
